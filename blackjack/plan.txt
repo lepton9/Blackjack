@@ -1,0 +1,10 @@
+cards
+deck, contains cards (Card class)
+	- 52 cards
+	- delete the cards after they are played
+the game
+	- many decks in the game
+	- new set of decks when there are no more cards
+dealer
+palyer input
+
