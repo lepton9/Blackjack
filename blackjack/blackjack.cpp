@@ -5,9 +5,25 @@ enum Suit { hearts, diamonds, clubs, spades, last };
 
 class Card {
 	public:
-		int suit;
-		int rank;
+		unsigned int suit;
+		unsigned int rank;
+		string SuitToString();
 };
+
+string Card::SuitToString() {
+	switch(suit) {
+		case(0):
+			return "hearts";
+		case(1):
+			return "diamonds";
+		case(2):
+			return "clubs";
+		case(3):
+			return "spades";
+		default:
+			return "";
+	}
+}
 
 
 class Deck {
@@ -15,7 +31,7 @@ class Deck {
 		Card deck[52];
 		//Card* deck = cards; // Points to the first element of the array
 		void CreateDeck();
-		void Shuffle();
+		void Shuffle(Card* c1, Card* c2);
 };
 
 void Deck::CreateDeck() {
@@ -24,24 +40,34 @@ void Deck::CreateDeck() {
 			Card card;
 			card.rank = j;
 			card.suit = e;
-			*(deck + e*13 + j) = card;
+			deck[e*13 + j - 1] = card;
 		}
 	}	
 };
 
-void Deck::Shuffle() {
+void Deck::Shuffle(Card* firstCard, Card* lastCard) {
+	for (int i = (lastCard-firstCard)-1; i>0; i--) {
+
+	}
 
 };
+
+void PrintAllCards(Deck d) {
+	for (Card c : d.deck) {
+		cout << c.SuitToString() << " " << c.rank << endl;
+	}
+}
 
 int main() {
 	cout << "Making the deck" << endl;
 	Deck d;
 	d.CreateDeck();
 	cout << d.deck << endl;
-	for (Card c : d.deck) {
-		cout << c.suit << " " << c.rank << endl;
-	}
-	cout << d.deck[52].suit << " " << d.deck[52].rank << endl;
-	cout << (sizeof(d.deck) / sizeof(int)) / 2;
+	PrintAllCards(d);
+
+	cout << "Cards in the deck: " << (sizeof(d.deck) / sizeof(int)) / 2;
+	
+	//random_shuffle(&d.deck(0, &d.deck[51]))
+
 	return 0;
 }
