@@ -1,4 +1,5 @@
 #include <iostream>
+#include <ctime>
 using namespace std;
 
 enum Suit { hearts, diamonds, clubs, spades, last };
@@ -45,29 +46,72 @@ void Deck::CreateDeck() {
 	}	
 };
 
-void Deck::Shuffle(Card* firstCard, Card* lastCard) {
-	for (int i = (lastCard-firstCard)-1; i>0; i--) {
 
-	}
-
-};
-
-void PrintAllCards(Deck d) {
+void PrintAllCards(Deck &d) {
 	for (Card c : d.deck) {
 		cout << c.SuitToString() << " " << c.rank << endl;
 	}
 }
 
-int main() {
-	cout << "Making the deck" << endl;
-	Deck d;
-	d.CreateDeck();
-	cout << d.deck << endl;
-	PrintAllCards(d);
+class Game {
+	public:
+		Deck decks[4];
+		void Shuffle();
+		void Swap(Card &c1, Card &c2);
+		void InitializeDecks();
+		Card DrawCard();
+};
 
-	cout << "Cards in the deck: " << (sizeof(d.deck) / sizeof(int)) / 2;
+void Game::Shuffle() {
+	srand(time(NULL)); // Sets the seed for the rand num generator
+	int maxCards = (sizeof(decks) / sizeof(Card));
+	Card *pfCard = &decks[0].deck[0]; // Points to the first card of the first deck
+	for(int ci = 0; ci < maxCards; ci++) {
+		Swap(*(pfCard + ci), *(pfCard + (rand()%(maxCards - ci + 1) + ci)));
+	}	
+};
+
+void Game::Swap(Card &c1, Card &c2) {
+	Card temp = c1;
+	c1 = c2;
+	c2 = temp;
+};
+
+void Game::InitializeDecks() {
+	for (int i = 0; i < 4; i++) {
+		Deck d;
+		d.CreateDeck();
+		decks[i] = d;
+	}
+};
+
+Card Game::DrawCard() {
+
+};
+
+void Initialize() {
+
+};
+
+void processInput() {
+};
+
+void Update() {
+};
+
+void Render() {
+};
+
+int main() {
+	cout << "Initializing the game..." << endl;
 	
-	//random_shuffle(&d.deck(0, &d.deck[51]))
+	Game game;
+	game.InitializeDecks();
+
+	cout << "Decks in game: " << (sizeof(game.decks) / sizeof(Deck)) << endl;
+	cout << "Cards in game: " << (sizeof(game.decks) / sizeof(Card)) << endl;
+	
+	game.Shuffle();
 
 	return 0;
 }
