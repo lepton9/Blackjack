@@ -56,8 +56,21 @@ void PrintAllCardsInDeck(Deck &d) {
 	}
 }
 
+class Player {
+        public:
+                int balance;
+                vector<Card> cards;
+};
+
+class Dealer {
+        public:
+                vector<Card> cards;
+};
+
 class Game {
 	public:
+		Dealer dealer;
+		Player player;
 		vector<Card> cards;
 		void Shuffle();
 		void Swap(Card &c1, Card &c2);
@@ -98,11 +111,28 @@ Card Game::DrawCard() {
 	return *pulledCard;
 };
 
-void Initialize() {
 
+Game Initialize() {
+	Game game;
+	game.InitializeDecks();
+	game.player.balance = 1000;
+	return game;
 };
 
-void Input() {
+void Input(Game &game) {
+	cout << "Draw(d) or stand(s): ";
+	char input;
+	cin >> input;
+
+	switch (input) {
+	case('d'):
+		game.DrawCard();
+
+	case('s'):
+		break;
+	default:
+		break;
+	}
 };
 
 void Update() {
@@ -120,16 +150,15 @@ void PrintAllCards(Game game) {
 int main() {
 	cout << "Initializing the game..." << endl;
 	
-	Game game;
-	game.InitializeDecks();
-	
+	Game game = Initialize();
+	game.Shuffle();
 	cout << "Decks in game: " << game.cards.size() / 52 << endl;
 	cout << "Cards in the game: " << game.cards.size() << endl;
 
-	game.Shuffle();
+	//game.Shuffle();
 
 
-	PrintAllCards(game);
+	//PrintAllCards(game);
 	cout << "Last card: " << game.DrawCard().rank << endl;
 
 	return 0;
