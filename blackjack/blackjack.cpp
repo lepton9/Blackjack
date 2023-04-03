@@ -33,7 +33,6 @@ class Deck {
 	public:
 		vector<Card> deck;
 		vector<Card> CreateDeck();
-		void Shuffle(Card* c1, Card* c2);
 };
 
 vector<Card> Deck::CreateDeck() {
@@ -76,6 +75,7 @@ class Game {
 		void Swap(Card &c1, Card &c2);
 		void InitializeDecks();
 		Card DrawCard();
+		int EvalCard(Card* card);
 };
 
 void Game::Shuffle() {
@@ -98,9 +98,9 @@ void Game::Swap(Card &c1, Card &c2) {
 void Game::InitializeDecks() {
 	for (int i = 0; i < 4; i++) {
 		Deck deck;
-		vector<Card> fullDeck = deck.CreateDeck();
+		deck.CreateDeck();
 		
-		cards.insert(cards.end(), fullDeck.begin(), fullDeck.end());
+		cards.insert(cards.end(), deck.deck.begin(), deck.deck.end());
 	}
 };
 
@@ -109,6 +109,11 @@ Card Game::DrawCard() {
 	cards.pop_back();
 	
 	return *pulledCard;
+};
+
+int Game::EvalCard(Card* card) {
+	if ((*card).rank < 10) return (*card).rank;
+	else return 10;
 };
 
 
@@ -158,7 +163,7 @@ int main() {
 	//game.Shuffle();
 
 
-	//PrintAllCards(game);
+	PrintAllCards(game);
 	cout << "Last card: " << game.DrawCard().rank << endl;
 
 	return 0;
