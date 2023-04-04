@@ -71,10 +71,11 @@ class Game {
 		Dealer dealer;
 		Player player;
 		vector<Card> cards;
+		Card* pulledCard;
 		void Shuffle();
 		void Swap(Card &c1, Card &c2);
 		void InitializeDecks();
-		Card DrawCard();
+		void DrawCard();
 		int EvalCard(Card* card);
 };
 
@@ -104,11 +105,10 @@ void Game::InitializeDecks() {
 	}
 };
 
-Card Game::DrawCard() {
-	Card* pulledCard = &cards.back();
+void Game::DrawCard() {
+	Card* lastCard = &cards.back();
+	pulledCard = lastCard;
 	cards.pop_back();
-	
-	return *pulledCard;
 };
 
 int Game::EvalCard(Card* card) {
@@ -117,22 +117,30 @@ int Game::EvalCard(Card* card) {
 };
 
 
-Game Initialize() {
+Game InitializeGame() {
 	Game game;
 	game.InitializeDecks();
-	game.player.balance = 1000;
+	
+	Player p;
+	p.balance = 1000;
+	game.player = p;
+
+	Dealer d;
+	game.dealer = d;
+
 	return game;
 };
 
 void Input(Game &game) {
-	cout << "Draw(d) or stand(s): ";
+	cout << "Hit(h) or stand(s): ";
 	char input;
 	cin >> input;
 
 	switch (input) {
-	case('d'):
+	case('h'):
 		game.DrawCard();
-
+		cout << "Pulled card: " << (*game.pulledCard).rank << endl;
+		break;
 	case('s'):
 		break;
 	default:
@@ -140,31 +148,41 @@ void Input(Game &game) {
 	}
 };
 
-void Update() {
+void Update(Game &game) {
+
 };
 
-void Render() {
+void Render(Game &game) {
+
 };
 
 void PrintAllCards(Game game) {
 	for (int i = 0; i < game.cards.size(); i++) {
-		cout << game.cards[i].rank << endl;
+		cout << game.cards[i].rank << ", ";
 	}
+	cout << endl;
 };
 
 int main() {
 	cout << "Initializing the game..." << endl;
 	
-	Game game = Initialize();
-	game.Shuffle();
+	Game game = InitializeGame();
+
 	cout << "Decks in game: " << game.cards.size() / 52 << endl;
 	cout << "Cards in the game: " << game.cards.size() << endl;
 
-	//game.Shuffle();
+	game.Shuffle();
 
 
 	PrintAllCards(game);
-	cout << "Last card: " << game.DrawCard().rank << endl;
+	cout << "Player balance: " << game.player.balance << endl;
+
+
+	while(true) {
+		Input(game);
+		Update(game);
+		Render(game);
+	}
 
 	return 0;
 }
