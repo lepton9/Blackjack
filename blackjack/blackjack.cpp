@@ -66,6 +66,7 @@ class Dealer {
                 vector<Card> cards;
 };
 
+
 class Game {
 	public:
 		Dealer dealer;
@@ -77,6 +78,8 @@ class Game {
 		void InitializeDecks();
 		void DrawCard();
 		int EvalCard(Card* card);
+		int EvalTotal(vector<Card> &cardsOnHand);
+		void ResetTable();
 };
 
 void Game::Shuffle() {
@@ -112,8 +115,24 @@ void Game::DrawCard() {
 };
 
 int Game::EvalCard(Card* card) {
+	if ((*card).rank == 1) return 11; // Ace
 	if ((*card).rank < 10) return (*card).rank;
 	else return 10;
+};
+
+int Game::EvalTotal(vector<Card> &cardsOnHand) {
+	int sum = 0;
+
+	if (cardsOnHand.empty()) return sum;
+	for (Card c : cardsOnHand) {
+		sum += EvalCard(&c);
+	}
+	return sum;
+};
+
+void Game::ResetTable() {
+	player.cards.clear();
+	dealer.cards.clear();
 };
 
 
@@ -131,21 +150,71 @@ Game InitializeGame() {
 	return game;
 };
 
-void Input(Game &game) {
-	cout << "Hit(h) or stand(s): ";
-	char input;
-	cin >> input;
+void PrintStateOfGame(Game &game) {
+        cout << "Dealer: " << game.EvalTotal(game.dealer.cards) << endl;
+        cout << "Player: " << game.EvalTotal(game.player.cards) << "\n" << endl;
+};
 
-	switch (input) {
-	case('h'):
-		game.DrawCard();
-		cout << "Pulled card: " << (*game.pulledCard).rank << endl;
-		break;
-	case('s'):
-		break;
-	default:
-		break;
+void HandleGameEnd(Game &game, int result) {
+	if (result < 0) {
+		// lose
 	}
+	if (result > 0) {
+		// win
+		// check if blackjack
+	}
+	else {
+		// draw
+	}
+};
+
+void EvalPlayerState(Game &game) {
+	if (game.EvalTotal(game.player.cards) <= 21) return;
+	else {
+		cout << "You bust!" << endl;
+		HandleGameEnd(game, -1); // Lose
+	}
+};
+
+void EvalStateOfGame(Game &game) {
+	int playerTotal = game.EvalTotal(game.player.cards);
+	int dealerTotal = game.EvalTotal(game.dealer.cards);
+
+	HandleGameEnd(game, playerTotal - dealerTotal);
+};
+
+void DealerTurn(Game &game) {
+	if (game.EvalTotal(game.dealer.cards) < 17) {
+		game.DrawCard();
+		game.dealer.cards.push_back(*game.pulledCard);
+		cout << "Dealer drew: " << game.EvalCard(game.pulledCard) << endl;
+		PrintStateOfGame(game);
+	}
+};
+
+void PlayerTurn(Game &game) {
+	cout << "Hit(h) or stand(s): ";
+        char input;
+        cin >> input;
+
+        switch (input) {
+        case('h'):
+                game.DrawCard();
+		game.player.cards.push_back(*game.pulledCard);
+		PrintStateOfGame(game);
+		EvalPlayerState(game);
+		break;
+        case('s'):
+		EvalStateOfGame(game);
+                break;
+        default:
+                break;
+	}
+};
+
+void Input(Game &game) {
+	DealerTurn(game);
+	PlayerTurn(game);
 };
 
 void Update(Game &game) {
@@ -175,7 +244,7 @@ int main() {
 
 
 	PrintAllCards(game);
-	cout << "Player balance: " << game.player.balance << endl;
+	cout << "Player balance: " << game.player.balance << "\n" << endl;
 
 
 	while(true) {
