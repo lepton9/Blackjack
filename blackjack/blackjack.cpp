@@ -55,15 +55,53 @@ void PrintAllCardsInDeck(Deck &d) {
 	}
 }
 
-class Player {
-        public:
-                int balance;
-                vector<Card> cards;
+class P {
+	public:
+		vector<Card> cards;
 };
 
-class Dealer {
+class Player : public P {
         public:
-                vector<Card> cards;
+                double balance;
+		double bet = 0;
+
+		bool SetBet(double amount) {
+			if (balance >= amount) {
+				bet = amount;
+				balance -= amount;
+				return true;
+			}
+			return false;
+		}
+
+		double HandleWin() {
+			double am = 2*bet;
+			balance += am;
+			bet = 0;
+			return am;
+		}
+		double HandleBJ() {
+			double am = 2.5*bet;
+			balance += am;
+			bet = 0;
+			return am;
+		}
+		double HandleLose() {
+			double am = bet;
+			bet = 0;
+			return am;
+		}
+		double HandlePush() {
+			double am = bet;
+			balance += am;
+			bet = 0;
+			return am;
+		}
+};
+
+class Dealer : public P {
+        public:
+                string dealerName = "dealer";
 };
 
 
@@ -73,12 +111,25 @@ class Game {
 		Player player;
 		vector<Card> cards;
 		Card* pulledCard;
+		bool gameEnd = false;
+
 		void Shuffle();
 		void Swap(Card &c1, Card &c2);
 		void InitializeDecks();
 		void DrawCard();
+		void HitPlayer();
+		void HitDealer();
 		int EvalCard(Card* card);
 		int EvalTotal(vector<Card> &cardsOnHand);
+		bool HandleGameEnd(int result);
+		bool EvalPlayerState();
+		bool EvalDealerState();
+		bool EvalStateOfGame();
+		bool DealerTurn();
+		bool PlayerTurn();
+		void ServeFirstCards();
+
+		void PrintStateOfGame();
 		void ResetTable();
 };
 
@@ -112,6 +163,16 @@ void Game::DrawCard() {
 	Card* lastCard = &cards.back();
 	pulledCard = lastCard;
 	cards.pop_back();
+};
+
+void Game::HitPlayer() {
+         DrawCard();
+         player.cards.push_back(*pulledCard);
+};
+
+void Game::HitDealer() {
+         DrawCard();
+         dealer.cards.push_back(*pulledCard);
 };
 
 int Game::EvalCard(Card* card) {
@@ -150,71 +211,101 @@ Game InitializeGame() {
 	return game;
 };
 
-void PrintStateOfGame(Game &game) {
-        cout << "Dealer: " << game.EvalTotal(game.dealer.cards) << endl;
-        cout << "Player: " << game.EvalTotal(game.player.cards) << "\n" << endl;
+void Game::PrintStateOfGame() {
+        cout << "Dealer: " << EvalTotal(dealer.cards) << endl;
+        cout << "Player: " << EvalTotal(player.cards) << "\n" << endl;
 };
 
-void HandleGameEnd(Game &game, int result) {
+bool Game::HandleGameEnd(int result) {
+	gameEnd = true;
 	if (result < 0) {
-		// lose
+		cout << "You lost " << player.HandleLose() << endl;;
 	}
-	if (result > 0) {
-		// win
-		// check if blackjack
+	else if (result > 0) {
+		if (EvalTotal(player.cards) == 21) {
+			cout << "Blackjack! You won " << player.HandleBJ() << endl;
+		}
+		else {
+			cout << "You won " << player.HandleWin() << endl;;
+		}
 	}
 	else {
-		// draw
+		cout << "Push! Returned " << player.HandlePush() << endl;;
 	}
+
+	return false;
 };
 
-void EvalPlayerState(Game &game) {
-	if (game.EvalTotal(game.player.cards) <= 21) return;
+bool Game::EvalPlayerState() {
+	if (EvalTotal(player.cards) <= 21) return true;
 	else {
 		cout << "You bust!" << endl;
-		HandleGameEnd(game, -1); // Lose
+		return HandleGameEnd(-1); // Lose
 	}
 };
 
-void EvalStateOfGame(Game &game) {
-	int playerTotal = game.EvalTotal(game.player.cards);
-	int dealerTotal = game.EvalTotal(game.dealer.cards);
-
-	HandleGameEnd(game, playerTotal - dealerTotal);
-};
-
-void DealerTurn(Game &game) {
-	if (game.EvalTotal(game.dealer.cards) < 17) {
-		game.DrawCard();
-		game.dealer.cards.push_back(*game.pulledCard);
-		cout << "Dealer drew: " << game.EvalCard(game.pulledCard) << endl;
-		PrintStateOfGame(game);
+bool Game::EvalDealerState() {
+	if (EvalTotal(dealer.cards) > 21) {
+		return HandleGameEnd(1); // Win
+	}
+	else {
+		return EvalStateOfGame();
 	}
 };
 
-void PlayerTurn(Game &game) {
+bool Game::EvalStateOfGame() {
+	int playerTotal = EvalTotal(player.cards);
+	int dealerTotal = EvalTotal(dealer.cards);
+
+	return HandleGameEnd(playerTotal - dealerTotal);
+};
+
+bool Game::DealerTurn() {
+	while(EvalTotal(dealer.cards) < 17) {
+		HitDealer();
+		cout << "Dealer drew: " << EvalCard(pulledCard) << endl;
+		PrintStateOfGame();
+	}
+	return EvalDealerState();
+};
+
+bool Game::PlayerTurn() {
+	PrintStateOfGame();
+	if (!EvalPlayerState()) {
+		return false;
+	}
+
 	cout << "Hit(h) or stand(s): ";
         char input;
         cin >> input;
 
         switch (input) {
         case('h'):
-                game.DrawCard();
-		game.player.cards.push_back(*game.pulledCard);
-		PrintStateOfGame(game);
-		EvalPlayerState(game);
-		break;
+		cout << "Hit!" << endl;
+                HitPlayer();
+
+		cout << "Drew: " << pulledCard->rank << endl;
+
+		PrintStateOfGame();
+		return EvalPlayerState();
         case('s'):
-		EvalStateOfGame(game);
-                break;
+		cout << "Stand" << endl;
+		return false;
         default:
-                break;
+                return false;
 	}
 };
 
+void Game::ServeFirstCards() {
+	HitPlayer();
+	HitDealer();
+	HitPlayer();
+	HitDealer();
+};
+
+
 void Input(Game &game) {
-	DealerTurn(game);
-	PlayerTurn(game);
+
 };
 
 void Update(Game &game) {
@@ -232,6 +323,18 @@ void PrintAllCards(Game game) {
 	cout << endl;
 };
 
+void Begin(Game &game) {
+	game.ServeFirstCards();
+	while(game.PlayerTurn());
+	if (!game.gameEnd) game.DealerTurn();
+};
+
+void NewGame(Game &game) {
+	game.gameEnd = false;
+	game.ResetTable();
+	Begin(game);
+};
+
 int main() {
 	cout << "Initializing the game..." << endl;
 	
@@ -244,14 +347,51 @@ int main() {
 
 
 	PrintAllCards(game);
-	cout << "Player balance: " << game.player.balance << "\n" << endl;
-
 
 	while(true) {
-		Input(game);
-		Update(game);
-		Render(game);
+		string betAmStr;
+		int betAm;
+
+		cout << "Balance: " << game.player.balance << endl;
+		cout << "Set bet: ";
+		cin >> betAmStr;
+		cout << endl;
+
+		try {
+			betAm = stod(betAmStr);
+		}
+		catch (...) {
+			cout << "Invalid bet amount!" << endl;
+			continue;
+		}
+
+		if (!game.player.SetBet(betAm)) {
+			cout << "Not enough money to bet " << betAmStr << endl;
+			continue;
+		}
+
+		NewGame(game);
+	
+		char ng;
+		cout << "New game? [y/n]: ";
+		cin >> ng;
+		cout << endl;
+
+		switch(ng) {
+			case('y'):
+				continue;
+			case('n'):
+				break;
+			default:
+				break;
+		}
+		break;
 	}
 
 	return 0;
+
+// Make that the dealers second card is upside down
+// And formatting with the outputs
+
+
 }
