@@ -20,3 +20,9 @@ dealer shows the card and hits if < 1
 ServeFirstCards();
 input from player
 dealer shows card and hits if needed
+
+clubs    -%
+diamonds <>
+hearts   <3
+spades   {>
+

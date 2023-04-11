@@ -16,11 +16,11 @@ class Card {
 string Card::SuitToString() {
 	switch(suit) {
 		case(0):
-			return "hearts";
+			return "clubs";
 		case(1):
 			return "diamonds";
 		case(2):
-			return "clubs";
+			return "hearts";
 		case(3):
 			return "spades";
 		default:
@@ -48,12 +48,6 @@ vector<Card> Deck::CreateDeck() {
 	return deck;
 };
 
-
-void PrintAllCardsInDeck(Deck &d) {
-	for (Card c : d.deck) {
-		cout << c.SuitToString() << " " << c.rank << endl;
-	}
-}
 
 class P {
 	public:
@@ -102,6 +96,7 @@ class Player : public P {
 class Dealer : public P {
         public:
                 string dealerName = "dealer";
+		Card* faceDownCard = NULL;
 };
 
 
@@ -172,7 +167,19 @@ void Game::HitPlayer() {
 
 void Game::HitDealer() {
          DrawCard();
-         dealer.cards.push_back(*pulledCard);
+
+	 if (dealer.cards.size() == 1 && dealer.faceDownCard == NULL) {
+		dealer.faceDownCard = pulledCard;
+	 	return;
+	 }
+	 if (dealer.faceDownCard != NULL) {
+		dealer.cards.push_back(*dealer.faceDownCard);
+		//delete dealer.faceDownCard;
+		dealer.faceDownCard = NULL;
+	 }
+	 else {
+         	dealer.cards.push_back(*pulledCard);
+	 }
 };
 
 int Game::EvalCard(Card* card) {
@@ -270,7 +277,6 @@ bool Game::DealerTurn() {
 };
 
 bool Game::PlayerTurn() {
-	PrintStateOfGame();
 	if (!EvalPlayerState()) {
 		return false;
 	}
@@ -290,6 +296,7 @@ bool Game::PlayerTurn() {
 		return EvalPlayerState();
         case('s'):
 		cout << "Stand" << endl;
+		PrintStateOfGame();
 		return false;
         default:
                 return false;
@@ -325,6 +332,7 @@ void PrintAllCards(Game game) {
 
 void Begin(Game &game) {
 	game.ServeFirstCards();
+	game.PrintStateOfGame();
 	while(game.PlayerTurn());
 	if (!game.gameEnd) game.DealerTurn();
 };
@@ -343,6 +351,7 @@ int main() {
 	cout << "Decks in game: " << game.cards.size() / 52 << endl;
 	cout << "Cards in the game: " << game.cards.size() << endl;
 
+	cout << "Shuffling..." << endl;
 	game.Shuffle();
 
 
@@ -389,9 +398,5 @@ int main() {
 	}
 
 	return 0;
-
-// Make that the dealers second card is upside down
-// And formatting with the outputs
-
 
 }
