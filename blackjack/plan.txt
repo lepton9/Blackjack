@@ -26,3 +26,13 @@ diamonds <>
 hearts   <3
 spades   {>
 
+ _______
+| TODO: |
+---------
+
+- make PrintAsciiCard to check if ascii card is already searched from the asciicards file and is in the vector to prevent duplicates
+- make to dealers faceDownCard is shown as blank card
+- implement to print the cards in the game
+- create makefile to compile all the file
+- make cool back art for the blank card
+

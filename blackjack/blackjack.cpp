@@ -1,6 +1,7 @@
 #include <iostream>
 #include <ctime>
 #include <vector>
+#include "AsciiCards.h"
 
 using namespace std;
 
@@ -52,6 +53,20 @@ vector<Card> Deck::CreateDeck() {
 class P {
 	public:
 		vector<Card> cards;
+
+		void PrintAsciiCards() {
+			int cardHeight = 5;
+			vector<vector<string>> asciiCards;
+			for (Card card : cards) {
+				asciiCards.push_back(GetAsciiCard({card.suit, card.rank}));
+			}
+			for (int i = 0; i < cardHeight; i++) {
+				for (vector<string> asciiCard : asciiCards) {
+					cout << asciiCard[i];
+				}
+				cout << endl;
+			}
+		};
 };
 
 class Player : public P {
@@ -277,6 +292,9 @@ bool Game::DealerTurn() {
 };
 
 bool Game::PlayerTurn() {
+
+	player.PrintAsciiCards();
+	
 	if (!EvalPlayerState()) {
 		return false;
 	}
