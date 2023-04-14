@@ -30,7 +30,6 @@ spades   {>
 | TODO: |
 ---------
 
-- evaluate ace either as 1 or 11
 - create makefile to compile all the files
 - make cool back art for the blank card
 

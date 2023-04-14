@@ -225,25 +225,12 @@ void Game::HitDealer() {
 	 }
 };
 
-int Game::EvalCard(Card* card) {
-	if ((*card).rank == 1) return 11; // Ace
-	if ((*card).rank < 10) return (*card).rank;
-	else return 10;
-};
-
-int Game::EvalTotal(vector<Card> &cardsOnHand) {
-	int sum = 0;
-
-	if (cardsOnHand.empty()) return sum;
-	for (Card c : cardsOnHand) {
-		sum += EvalCard(&c);
-	}
-	return sum;
-};
 
 void Game::ResetTable() {
 	player.cards.clear();
+	player.cardsTotal = 0;
 	dealer.cards.clear();
+	dealer.cardsTotal = 0;
 };
 
 
@@ -263,9 +250,9 @@ Game InitializeGame() {
 void Game::PrintStateOfGame() {
 	system("clear");
 	dealer.PrintAsciiCards();
-        cout << "Dealer: " << EvalTotal(dealer.cards) << endl;
+        cout << "Dealer: " << dealer.cardsTotal << endl;
 	player.PrintAsciiCards();
-        cout << "Player: " << EvalTotal(player.cards) << "\n" << endl;
+        cout << "Player: " << player.cardsTotal << "\n" << endl;
 };
 
 bool Game::HandleGameEnd(int result) {
@@ -279,7 +266,7 @@ bool Game::HandleGameEnd(int result) {
 		cout << "You lost " << player.HandleLose() << endl;;
 	}
 	else if (result > 0) {
-		if (EvalTotal(player.cards) == 21) {
+		if (player.cardsTotal == 21) {
 			cout << "Blackjack! You won " << player.HandleBJ() << endl;
 		}
 		else {
@@ -294,7 +281,7 @@ bool Game::HandleGameEnd(int result) {
 };
 
 bool Game::EvalPlayerState() {
-	if (EvalTotal(player.cards) <= 21) return true;
+	if (player.cardsTotal <= 21) return true;
 	else {
 		cout << "You bust!" << endl;
 		return HandleGameEnd(-1); // Lose
@@ -302,7 +289,7 @@ bool Game::EvalPlayerState() {
 };
 
 bool Game::EvalDealerState() {
-	if (EvalTotal(dealer.cards) > 21) {
+	if (dealer.cardsTotal > 21) {
 		return HandleGameEnd(1); // Win
 	}
 	else {
@@ -311,14 +298,11 @@ bool Game::EvalDealerState() {
 };
 
 bool Game::EvalStateOfGame() {
-	int playerTotal = EvalTotal(player.cards);
-	int dealerTotal = EvalTotal(dealer.cards);
-
-	return HandleGameEnd(playerTotal - dealerTotal);
+	return HandleGameEnd(player.cardsTotal - dealer.cardsTotal);
 };
 
 bool Game::DealerTurn() {
-	while(EvalTotal(dealer.cards) < 17) {
+	while(dealer.cardsTotal < 17) {
 		Sleep(1000);
 		HitDealer();
 		PrintStateOfGame();
