@@ -1,3 +1,9 @@
+#ifdef _WIN32
+#include <Windows.h>
+#else
+#include <unistd.h>
+#endif
+
 #include <iostream>
 #include <ctime>
 #include <vector>
@@ -53,12 +59,16 @@ vector<Card> Deck::CreateDeck() {
 class P {
 	public:
 		vector<Card> cards;
+		int cardsTotal = 0;
 
 		void PrintAsciiCards() {
 			int cardHeight = 5;
 			vector<vector<string>> asciiCards;
 			for (Card card : cards) {
-				asciiCards.push_back(GetAsciiCard({card.suit, card.rank}));
+				asciiCards.push_back(GetAsciiCard(card.suit, card.rank));
+			}
+			if (asciiCards.size() < 2) {
+				asciiCards.push_back(GetAsciiCard()); // Blank card
 			}
 			for (int i = 0; i < cardHeight; i++) {
 				for (vector<string> asciiCard : asciiCards) {
@@ -67,11 +77,26 @@ class P {
 				cout << endl;
 			}
 		};
+
+
+		void EvalCard(Card* card) {
+			if ((*card).rank == 1) { // Ace
+				if (cardsTotal + 11 > 21) {
+					cardsTotal += 1;
+					return;
+				}
+				cardsTotal += 11;
+				return;
+			}
+			if ((*card).rank < 10) cardsTotal += (*card).rank;
+			else cardsTotal += 10;
+		};
+
 };
 
 class Player : public P {
         public:
-                double balance;
+                double balance = 1000;
 		double bet = 0;
 
 		bool SetBet(double amount) {
@@ -161,6 +186,7 @@ void Game::Swap(Card &c1, Card &c2) {
 };
 
 void Game::InitializeDecks() {
+	cards.clear();
 	for (int i = 0; i < 4; i++) {
 		Deck deck;
 		deck.CreateDeck();
@@ -178,22 +204,24 @@ void Game::DrawCard() {
 void Game::HitPlayer() {
          DrawCard();
          player.cards.push_back(*pulledCard);
+	 player.EvalCard(pulledCard);
 };
 
 void Game::HitDealer() {
-         DrawCard();
-
-	 if (dealer.cards.size() == 1 && dealer.faceDownCard == NULL) {
-		dealer.faceDownCard = pulledCard;
-	 	return;
-	 }
 	 if (dealer.faceDownCard != NULL) {
 		dealer.cards.push_back(*dealer.faceDownCard);
-		//delete dealer.faceDownCard;
+		dealer.EvalCard(dealer.faceDownCard);
 		dealer.faceDownCard = NULL;
+		return;
+	 }
+         DrawCard();
+
+	 if (dealer.cards.size() == 1) {
+		dealer.faceDownCard = pulledCard;
 	 }
 	 else {
          	dealer.cards.push_back(*pulledCard);
+		dealer.EvalCard(pulledCard);
 	 }
 };
 
@@ -224,7 +252,6 @@ Game InitializeGame() {
 	game.InitializeDecks();
 	
 	Player p;
-	p.balance = 1000;
 	game.player = p;
 
 	Dealer d;
@@ -234,13 +261,21 @@ Game InitializeGame() {
 };
 
 void Game::PrintStateOfGame() {
+	system("clear");
+	dealer.PrintAsciiCards();
         cout << "Dealer: " << EvalTotal(dealer.cards) << endl;
+	player.PrintAsciiCards();
         cout << "Player: " << EvalTotal(player.cards) << "\n" << endl;
 };
 
 bool Game::HandleGameEnd(int result) {
 	gameEnd = true;
 	if (result < 0) {
+		if (dealer.faceDownCard != NULL) {
+			HitDealer();
+			PrintStateOfGame();
+		}
+
 		cout << "You lost " << player.HandleLose() << endl;;
 	}
 	else if (result > 0) {
@@ -284,8 +319,8 @@ bool Game::EvalStateOfGame() {
 
 bool Game::DealerTurn() {
 	while(EvalTotal(dealer.cards) < 17) {
+		Sleep(1000);
 		HitDealer();
-		cout << "Dealer drew: " << EvalCard(pulledCard) << endl;
 		PrintStateOfGame();
 	}
 	return EvalDealerState();
@@ -293,8 +328,6 @@ bool Game::DealerTurn() {
 
 bool Game::PlayerTurn() {
 
-	player.PrintAsciiCards();
-	
 	if (!EvalPlayerState()) {
 		return false;
 	}
@@ -307,9 +340,6 @@ bool Game::PlayerTurn() {
         case('h'):
 		cout << "Hit!" << endl;
                 HitPlayer();
-
-		cout << "Drew: " << pulledCard->rank << endl;
-
 		PrintStateOfGame();
 		return EvalPlayerState();
         case('s'):
@@ -349,6 +379,13 @@ void PrintAllCards(Game game) {
 };
 
 void Begin(Game &game) {
+	if (game.cards.size() < 20) {
+		cout << "Shuffling new set of decks..." << endl;
+		game.InitializeDecks();
+		game.Shuffle();
+		Sleep(1000);
+	}
+
 	game.ServeFirstCards();
 	game.PrintStateOfGame();
 	while(game.PlayerTurn());
@@ -408,6 +445,7 @@ int main() {
 			case('y'):
 				continue;
 			case('n'):
+				cout << "Exiting..." << endl;
 				break;
 			default:
 				break;

@@ -3,9 +3,8 @@
 
 #include <vector>
 #include <string>
-#include <tuple>
 
 extern std::vector<std::vector<std::string>> asciiCards;
-std::vector<std::string> GetAsciiCard(std::tuple<int, int> cardSR);
+std::vector<std::string> GetAsciiCard(int cSuit = 0, int cRank = 0);
 
 #endif

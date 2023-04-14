@@ -30,9 +30,7 @@ spades   {>
 | TODO: |
 ---------
 
-- make PrintAsciiCard to check if ascii card is already searched from the asciicards file and is in the vector to prevent duplicates
-- make to dealers faceDownCard is shown as blank card
-- implement to print the cards in the game
-- create makefile to compile all the file
+- evaluate ace either as 1 or 11
+- create makefile to compile all the files
 - make cool back art for the blank card
 
