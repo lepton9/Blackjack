@@ -61,6 +61,11 @@ class P {
 		vector<Card> cards;
 		int cardsTotal = 0;
 
+		void Reset() {
+			cards.clear();
+			cardsTotal = 0;
+		};
+
 		void PrintAsciiCards() {
 			int cardHeight = 5;
 			vector<vector<string>> asciiCards;
@@ -154,8 +159,6 @@ class Game {
 		void DrawCard();
 		void HitPlayer();
 		void HitDealer();
-		int EvalCard(Card* card);
-		int EvalTotal(vector<Card> &cardsOnHand);
 		bool HandleGameEnd(int result);
 		bool EvalPlayerState();
 		bool EvalDealerState();
@@ -227,10 +230,8 @@ void Game::HitDealer() {
 
 
 void Game::ResetTable() {
-	player.cards.clear();
-	player.cardsTotal = 0;
-	dealer.cards.clear();
-	dealer.cardsTotal = 0;
+	player.Reset();
+	dealer.Reset();
 };
 
 
