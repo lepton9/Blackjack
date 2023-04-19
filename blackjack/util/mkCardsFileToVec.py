@@ -1,3 +1,4 @@
+import sys
 
 def cardTxtFileTf(fileName):
     file = fileName
@@ -11,7 +12,7 @@ def cardTxtFileTf(fileName):
 
     for line in content:
         card.append(line.replace("\n", ""))
-        if (i == 4):
+        if (i == 5):
             cards.append(card)
             card = []
             i = 0
@@ -22,5 +23,5 @@ def cardTxtFileTf(fileName):
 
 
 if __name__ == "__main__":
-    cards = cardTxtFileTf("cards.txt")
+    cards = cardTxtFileTf(sys.argv[1])
     print(cards)

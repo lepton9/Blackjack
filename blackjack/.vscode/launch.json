@@ -8,8 +8,8 @@
       "args": [],
       "stopAtEntry": false,
       "externalConsole": true,
-      "cwd": "d:/programming/blackjackGitRep/blackjack",
-      "program": "d:/programming/blackjackGitRep/blackjack/build/Debug/outDebug",
+      "cwd": "c:/Users/tonih/Developing/BlackJack/blackjack",
+      "program": "c:/Users/tonih/Developing/BlackJack/blackjack/build/Debug/outDebug",
       "MIMode": "gdb",
       "miDebuggerPath": "gdb",
       "setupCommands": [

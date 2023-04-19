@@ -57,6 +57,8 @@ vector<Card> Deck::CreateDeck() {
 
 
 class P {
+	int cardHeight = GetAsciiCard().size();
+	
 	public:
 		vector<Card> cards;
 		int cardsTotal = 0;
@@ -67,7 +69,6 @@ class P {
 		};
 
 		void PrintAsciiCards() {
-			int cardHeight = 5;
 			vector<vector<string>> asciiCards;
 			for (Card card : cards) {
 				asciiCards.push_back(GetAsciiCard(card.suit, card.rank));
@@ -75,6 +76,7 @@ class P {
 			if (asciiCards.size() < 2) {
 				asciiCards.push_back(GetAsciiCard()); // Blank card
 			}
+
 			for (int i = 0; i < cardHeight; i++) {
 				for (vector<string> asciiCard : asciiCards) {
 					cout << asciiCard[i];
@@ -332,7 +334,7 @@ bool Game::PlayerTurn() {
 		PrintStateOfGame();
 		return false;
         default:
-                return false;
+                PlayerTurn();
 	}
 };
 
@@ -384,6 +386,9 @@ void NewGame(Game &game) {
 };
 
 int main() {
+	
+	SetConsoleOutputCP(CP_UTF8);
+
 	cout << "Initializing the game..." << endl;
 	
 	Game game = InitializeGame();
@@ -399,13 +404,14 @@ int main() {
 
 	while(true) {
 		string betAmStr;
-		int betAm;
+		double betAm;
 
 		cout << "Balance: " << game.player.balance << endl;
 		cout << "Set bet: ";
 		cin >> betAmStr;
 		cout << endl;
-
+		
+		
 		try {
 			betAm = stod(betAmStr);
 		}
@@ -414,6 +420,10 @@ int main() {
 			continue;
 		}
 
+		if (betAm < 0) {
+			cout << "Bet must be positive!" << endl;
+			continue;
+		}
 		if (!game.player.SetBet(betAm)) {
 			cout << "Not enough money to bet " << betAmStr << endl;
 			continue;

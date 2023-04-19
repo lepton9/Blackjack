@@ -1,8 +1,11 @@
  _______
 | TODO: |
 ---------
-
-- make cool back art for the blank card
+- bet parsing:
+	- fix 4jhjh -> 4
+- fix 21 is only blackjack if it's two cards
+	- if sum of more than 2 cards is 21, it's not blackjack
+	- blackjack wins normal 21 if it's not blackjack also
 - make cool animations for the drawed cards
 - make the game compatible with older version of C++
 

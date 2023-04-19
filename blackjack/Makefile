@@ -8,5 +8,12 @@ blackjack.o: blackjack.cpp
 AsciiCards.o: AsciiCards.cpp
 	g++ -c AsciiCards.cpp
 
+debug:
+	g++ blackjack.cpp AsciiCards.cpp -pthread -g -o bjDebug
+	gdb -tui bjDebug
+
+run: 
+	./blackjack
+
 clean:
-	rm *.o blackjack
+	rm *.o blackjack bjDebug
