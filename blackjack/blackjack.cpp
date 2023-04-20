@@ -385,6 +385,26 @@ void NewGame(Game &game) {
 	Begin(game);
 };
 
+bool ValidateBet(string betAmStr, double* betAmD) {
+	string validChars = "1234567890";
+	bool commaFound = false;
+	
+	for (char c : betAmStr) {
+		if (c == '.') {
+			if (commaFound) return false;
+			commaFound = true;
+			continue;
+		}
+		if (validChars.find(c) == std::string::npos) return false;
+	}
+
+	*betAmD = stod(betAmStr);
+	
+	if (*betAmD < 0) return false;
+
+	return true;
+}
+
 int main() {
 	
 	SetConsoleOutputCP(CP_UTF8);
@@ -400,31 +420,23 @@ int main() {
 	game.Shuffle();
 
 
-	PrintAllCards(game);
+	// PrintAllCards(game);
 
 	while(true) {
 		string betAmStr;
-		double betAm;
+		double betAmD;
 
 		cout << "Balance: " << game.player.balance << endl;
 		cout << "Set bet: ";
 		cin >> betAmStr;
 		cout << endl;
 		
+		if (!ValidateBet(betAmStr, &betAmD)) {
+			cout << "Invalid bet amount " << betAmStr << endl;
+			continue;
+		}
 		
-		try {
-			betAm = stod(betAmStr);
-		}
-		catch (...) {
-			cout << "Invalid bet amount!" << endl;
-			continue;
-		}
-
-		if (betAm < 0) {
-			cout << "Bet must be positive!" << endl;
-			continue;
-		}
-		if (!game.player.SetBet(betAm)) {
+		if (!game.player.SetBet(betAmD)) {
 			cout << "Not enough money to bet " << betAmStr << endl;
 			continue;
 		}
