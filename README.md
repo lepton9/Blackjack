@@ -9,6 +9,5 @@ make run
 or
 
 ./cnr.sh
-./blackjack.exe
 ```
 

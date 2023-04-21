@@ -13,6 +13,7 @@
 
 using namespace std;
 
+
 enum Suit { hearts, diamonds, clubs, spades, last };
 
 class Card {
@@ -156,7 +157,7 @@ class Game {
 		vector<Card> cards;
 		Card* pulledCard;
 		bool gameEnd = false;
-
+		
 		void Shuffle();
 		void Swap(Card &c1, Card &c2);
 		void InitializeDecks();
@@ -170,7 +171,6 @@ class Game {
 		bool DealerTurn();
 		bool PlayerTurn();
 		void ServeFirstCards();
-
 		void PrintStateOfGame();
 		void ResetTable();
 };
@@ -232,7 +232,6 @@ void Game::HitDealer() {
 	 }
 };
 
-
 void Game::ResetTable() {
 	player.Reset();
 	dealer.Reset();
@@ -287,9 +286,9 @@ bool Game::HandleGameEnd(int result) {
 				cout << "Dealer blackjack. You lost " << player.HandleLose() << endl;
 			}
 		}
-		cout << "Push! Returned " << player.HandlePush() << endl;;
+		else cout << "Push! Returned " << player.HandlePush() << endl;
 	}
-
+	cout << "Current balance: " << player.balance << endl;
 	return false;
 };
 
@@ -340,12 +339,13 @@ bool Game::PlayerTurn() {
 		PrintStateOfGame();
 		return EvalPlayerState();
         case('s'):
-		cout << "Stand" << endl;
+		cout << "Stand!" << endl;
 		PrintStateOfGame();
 		return false;
         default:
                 PlayerTurn();
 	}
+	return false;
 };
 
 void Game::ServeFirstCards() {
@@ -353,19 +353,6 @@ void Game::ServeFirstCards() {
 	HitDealer();
 	HitPlayer();
 	HitDealer();
-};
-
-
-void Input(Game &game) {
-
-};
-
-void Update(Game &game) {
-
-};
-
-void Render(Game &game) {
-
 };
 
 void PrintAllCards(Game game) {
@@ -415,12 +402,11 @@ bool ValidateBet(string betAmStr, double* betAmD) {
 	return true;
 }
 
-int main() {
+int main(int argc, char *argv[]) {
 	
 	SetConsoleOutputCP(CP_UTF8);
 
 	cout << "Initializing the game..." << endl;
-	
 	Game game = InitializeGame();
 
 	cout << "Decks in game: " << game.cards.size() / 52 << endl;
@@ -428,9 +414,6 @@ int main() {
 
 	cout << "Shuffling..." << endl;
 	game.Shuffle();
-
-
-	// PrintAllCards(game);
 
 	while(true) {
 		string betAmStr;
@@ -462,11 +445,9 @@ int main() {
 			case('y'):
 				continue;
 			case('n'):
-				cout << "Exiting..." << endl;
-				break;
-			default:
 				break;
 		}
+		cout << "Exiting..." << endl;
 		break;
 	}
 
