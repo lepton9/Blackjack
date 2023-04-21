@@ -1,7 +1,9 @@
 #ifdef _WIN32
 #include <Windows.h>
+#define CLEAR "cls"
 #else
 #include <unistd.h>
+#define CLEAR "clear"
 #endif
 
 #include <iostream>
@@ -251,7 +253,7 @@ Game InitializeGame() {
 };
 
 void Game::PrintStateOfGame() {
-	system("clear");
+	system(CLEAR);
 	dealer.PrintAsciiCards();
         cout << "Dealer: " << dealer.cardsTotal << endl;
 	player.PrintAsciiCards();
@@ -269,7 +271,7 @@ bool Game::HandleGameEnd(int result) {
 		cout << "You lost " << player.HandleLose() << endl;;
 	}
 	else if (result > 0) {
-		if (player.cardsTotal == 21) {
+		if (player.cardsTotal == 21 && player.cards.size() == 2) {
 			cout << "Blackjack! You won " << player.HandleBJ() << endl;
 		}
 		else {
@@ -277,6 +279,14 @@ bool Game::HandleGameEnd(int result) {
 		}
 	}
 	else {
+		if (player.cardsTotal == 21 && dealer.cardsTotal == 21) {
+			if (player.cards.size() == 2 && dealer.cards.size() > 2) {
+				cout << "Blackjack! You won " << player.HandleBJ() << endl;
+			}
+			else if (player.cards.size() > 2 && dealer.cards.size() == 2) {
+				cout << "Dealer blackjack. You lost " << player.HandleLose() << endl;
+			}
+		}
 		cout << "Push! Returned " << player.HandlePush() << endl;;
 	}
 
