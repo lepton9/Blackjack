@@ -10,6 +10,7 @@
 #include <ctime>
 #include <vector>
 #include "AsciiCards.h"
+#include <sstream>
 
 using namespace std;
 
@@ -157,6 +158,7 @@ class Game {
 		vector<Card> cards;
 		Card* pulledCard;
 		bool gameEnd = false;
+		int decksAm;
 		
 		void Shuffle();
 		void Swap(Card &c1, Card &c2);
@@ -194,7 +196,7 @@ void Game::Swap(Card &c1, Card &c2) {
 
 void Game::InitializeDecks() {
 	cards.clear();
-	for (int i = 0; i < 4; i++) {
+	for (int i = 0; i < decksAm; i++) {
 		Deck deck;
 		deck.CreateDeck();
 		
@@ -238,8 +240,9 @@ void Game::ResetTable() {
 };
 
 
-Game InitializeGame() {
+Game InitializeGame(int am) {
 	Game game;
+	game.decksAm = am;
 	game.InitializeDecks();
 	
 	Player p;
@@ -407,7 +410,19 @@ int main(int argc, char *argv[]) {
 	SetConsoleOutputCP(CP_UTF8);
 
 	cout << "Initializing the game..." << endl;
-	Game game = InitializeGame();
+
+	int decksAm;
+
+	if (argc >= 2) {
+		std::istringstream iss( argv[1] );
+
+		if ((iss >> decksAm) && iss.eof() && decksAm > 0);
+		else decksAm = 4;
+	}
+	else decksAm = 4;
+	
+	Game game = InitializeGame(decksAm);
+
 
 	cout << "Decks in game: " << game.cards.size() / 52 << endl;
 	cout << "Cards in the game: " << game.cards.size() << endl;

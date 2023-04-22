@@ -6,7 +6,13 @@
 - make the game compatible with older version of C++
 - add other commands like split and double down
 - refactoring
+	- make class variables private and make functions to modify them
 - documentation
+
+- multithreading
+	- one thread fro the game
+	- other to calculate all the card counting
+	- maybe pass the program a command line argument if want to show calculated cards or not
 
 clubs    -%
 diamonds <>
