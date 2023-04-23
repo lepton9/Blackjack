@@ -8,7 +8,16 @@ Player::Player() {
 	balance = 0;
 }
 
-bool Player::SetBet(double amount) {
+
+double Player::getBalance() {return balance;}
+
+void Player::setBalance(int bal) {
+	balance = bal;
+}
+
+double Player::getBet() {return bet;}
+
+bool Player::setBet(double amount) {
 	if (balance >= amount) {
 		bet = amount;
 		balance -= amount;

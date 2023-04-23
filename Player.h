@@ -4,12 +4,15 @@
 #include "P.h"
 
 class Player : public P {
-
-        public:
                 double balance;
 		double bet;
+        public:
+		double getBalance();
+		void setBalance(int bal);
 
-		bool SetBet(double amount);
+		double getBet();
+		bool setBet(double amount);
+
 		double HandleWin();
 		double HandleBJ();
 		double HandleLose();

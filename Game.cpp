@@ -15,6 +15,9 @@ using std::cout;
 using std::endl;
 using std::cin;
 
+
+bool gameEnd = false;
+
 Game::Game(int dAm, Player p, Dealer d) {
 	decksAm = dAm;
 	player = p;
@@ -28,7 +31,17 @@ Game::Game() {
 
 }
 
-bool gameEnd = false;
+
+bool Game::getGameEnd() {return gameEnd;}
+void Game::setGameEnd(bool end) {
+	gameEnd = end;
+}
+
+int Game::getDecksAm() {return decksAm;}
+void Game::setDecksAm(int am) {
+	decksAm = am;
+}
+
 
 void Game::Shuffle() {
 	srand(time(NULL)); // Sets the seed for the rand num generator
@@ -65,24 +78,24 @@ void Game::DrawCard() {
 
 void Game::HitPlayer() {
          DrawCard();
-         player.cards.push_back(*pulledCard);
+         player.pbToCards(*pulledCard);
 	 player.EvalCard(pulledCard);
 }
 
 void Game::HitDealer() {
 	 if (dealer.faceDownCard != NULL) {
-		dealer.cards.push_back(*dealer.faceDownCard);
+		dealer.pbToCards(*dealer.faceDownCard);
 		dealer.EvalCard(dealer.faceDownCard);
 		dealer.faceDownCard = NULL;
 		return;
 	 }
          DrawCard();
 
-	 if (dealer.cards.size() == 1) {
+	 if (dealer.getCards().size() == 1) {
 		dealer.faceDownCard = pulledCard;
 	 }
 	 else {
-         	dealer.cards.push_back(*pulledCard);
+         	dealer.pbToCards(*pulledCard);
 		dealer.EvalCard(pulledCard);
 	 }
 }
@@ -96,13 +109,13 @@ void Game::ResetTable() {
 void Game::PrintStateOfGame() {
 	system(CLEAR);
 	dealer.PrintAsciiCards();
-        cout << "Dealer: " << dealer.cardsTotal << endl;
+        cout << "Dealer: " << dealer.getCardsTotal() << endl;
 	player.PrintAsciiCards();
-        cout << "Player: " << player.cardsTotal << "\n" << endl;
+        cout << "Player: " << player.getCardsTotal() << "\n" << endl;
 }
 
 bool Game::HandleGameEnd(int result) {
-	gameEnd = true;
+	setGameEnd(true);
 	if (result < 0) {
 		if (dealer.faceDownCard != NULL) {
 			HitDealer();
@@ -112,7 +125,7 @@ bool Game::HandleGameEnd(int result) {
 		cout << "You lost " << player.HandleLose() << endl;;
 	}
 	else if (result > 0) {
-		if (player.cardsTotal == 21 && player.cards.size() == 2) {
+		if (player.getCardsTotal() == 21 && player.getCards().size() == 2) {
 			cout << "Blackjack! You won " << player.HandleBJ() << endl;
 		}
 		else {
@@ -120,22 +133,22 @@ bool Game::HandleGameEnd(int result) {
 		}
 	}
 	else {
-		if (player.cardsTotal == 21 && dealer.cardsTotal == 21) {
-			if (player.cards.size() == 2 && dealer.cards.size() > 2) {
+		if (player.getCardsTotal() == 21 && dealer.getCardsTotal() == 21) {
+			if (player.getCards().size() == 2 && dealer.getCards().size() > 2) {
 				cout << "Blackjack! You won " << player.HandleBJ() << endl;
 			}
-			else if (player.cards.size() > 2 && dealer.cards.size() == 2) {
+			else if (player.getCards().size() > 2 && dealer.getCards().size() == 2) {
 				cout << "Dealer blackjack. You lost " << player.HandleLose() << endl;
 			}
 		}
 		else cout << "Push! Returned " << player.HandlePush() << endl;
 	}
-	cout << "Current balance: " << player.balance << endl;
+	cout << "Current balance: " << player.getBalance() << endl;
 	return false;
 }
 
 bool Game::EvalPlayerState() {
-	if (player.cardsTotal <= 21) return true;
+	if (player.getCardsTotal() <= 21) return true;
 	else {
 		cout << "You bust!" << endl;
 		return HandleGameEnd(-1); // Lose
@@ -143,7 +156,7 @@ bool Game::EvalPlayerState() {
 }
 
 bool Game::EvalDealerState() {
-	if (dealer.cardsTotal > 21) {
+	if (dealer.getCardsTotal() > 21) {
 		return HandleGameEnd(1); // Win
 	}
 	else {
@@ -152,11 +165,11 @@ bool Game::EvalDealerState() {
 }
 
 bool Game::EvalStateOfGame() {
-	return HandleGameEnd(player.cardsTotal - dealer.cardsTotal);
+	return HandleGameEnd(player.getCardsTotal() - dealer.getCardsTotal());
 };
 
 bool Game::DealerTurn() {
-	while(dealer.cardsTotal < 17) {
+	while(dealer.getCardsTotal() < 17) {
 		Sleep(1000);
 		HitDealer();
 		PrintStateOfGame();

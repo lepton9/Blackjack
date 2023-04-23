@@ -12,16 +12,23 @@
 using std::vector;
 
 class Game {
+		bool gameEnd;
+		int decksAm;
+
 	public:
 		Dealer dealer;
 		Player player;
 		vector<Card> cards;
 		Card* pulledCard;
-		bool gameEnd;
-		int decksAm;
 	
 		Game(int dAm, Player p, Dealer d);
 		Game();
+
+		bool getGameEnd();
+		void setGameEnd(bool end);
+
+		int getDecksAm();
+		void setDecksAm(int am);
 
 		void Shuffle();
 		void Swap(Card &c1, Card &c2);

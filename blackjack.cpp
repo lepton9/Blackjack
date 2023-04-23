@@ -51,11 +51,11 @@ void Begin(Game &game) {
 	game.ServeFirstCards();
 	game.PrintStateOfGame();
 	while(game.PlayerTurn());
-	if (!game.gameEnd) game.DealerTurn();
+	if (!game.getGameEnd()) game.DealerTurn();
 };
 
 void NewGame(Game &game) {
-	game.gameEnd = false;
+	game.setGameEnd(false);
 	game.ResetTable();
 	Begin(game);
 };
@@ -99,19 +99,17 @@ int main(int argc, char *argv[]) {
 	Game game = InitializeGame(decksAm);
 
 
-	cout << "Decks in game: " << game.cards.size() / 52 << endl;
+	cout << "Decks in the game: " << game.cards.size() / 52 << endl;
 	cout << "Cards in the game: " << game.cards.size() << endl;
 
 	cout << "Shuffling..." << endl;
 	game.Shuffle();
 
-	PrintAllCards(game);
-
 	while(true) {
 		string betAmStr;
 		double betAmD;
 
-		cout << "Balance: " << game.player.balance << endl;
+		cout << "Balance: " << game.player.getBalance() << endl;
 		cout << "Set bet: ";
 		cin >> betAmStr;
 		cout << endl;
@@ -121,7 +119,7 @@ int main(int argc, char *argv[]) {
 			continue;
 		}
 		
-		if (!game.player.SetBet(betAmD)) {
+		if (!game.player.setBet(betAmD)) {
 			cout << "Not enough money to bet " << betAmStr << endl;
 			continue;
 		}

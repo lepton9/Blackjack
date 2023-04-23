@@ -7,10 +7,14 @@
 using std::vector;
 
 class P {
-	
-	public:
 		vector<Card> cards;
 		int cardsTotal;
+	public:
+
+		vector<Card> getCards();
+		void pbToCards(Card card);
+		int getCardsTotal();
+		void addCardsTotal(int cValue);
 
 		void Reset();
 		void PrintAsciiCards();

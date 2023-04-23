@@ -9,6 +9,19 @@ using std::endl;
 int cardHeight = 6;
 int cardsTotal = 0;
 
+
+vector<Card> P::getCards() {return cards;}
+
+void P::pbToCards(Card card) {
+	cards.push_back(card);
+}
+
+int P::getCardsTotal() {return cardsTotal;}
+
+void P::addCardsTotal(int cValue) {
+	cardsTotal += cValue;
+}
+
 void P::Reset() {
 	cards.clear();
 	cardsTotal = 0;
