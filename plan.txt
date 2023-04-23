@@ -2,6 +2,7 @@
 | TODO: |
 ‾‾‾‾‾‾‾‾‾
 
+- make functions to handle object variables and make variables private
 - make cool animations for the drawed cards
 - make the game compatible with older version of C++
 - add other commands like split and double down

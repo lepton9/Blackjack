@@ -4,9 +4,12 @@
 #include <vector>
 #include <string>
 
-extern std::vector<std::vector<std::string>> asciiCards;
-extern std::vector<std::vector<std::string>> utcCards;
+using std::vector;
+using std::string;
 
-std::vector<std::string> GetAsciiCard(int cSuit = 0, int cRank = 0);
+extern vector<vector<string>> asciiCards;
+extern vector<vector<string>> utcCards;
+
+vector<string> GetAsciiCard(int cSuit = 0, int cRank = 0);
 
 #endif

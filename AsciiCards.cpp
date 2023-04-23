@@ -1,6 +1,7 @@
 #include "AsciiCards.h"
+#include <iostream>
 
-using namespace std;
+using std::cout;
 
 vector<string> GetAsciiCard(int cSuit, int cRank) {
 	return utcCards[cSuit*13 + cRank];
