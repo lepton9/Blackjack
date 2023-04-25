@@ -16,10 +16,10 @@ using std::endl;
 using std::cin;
 
 
-bool gameEnd = false;
-
 Game::Game(int dAm, Player p, Dealer d) {
 	decksAm = dAm;
+	pulledCard = NULL;
+	gameEnd = false;
 	player = p;
 	dealer = d;
 }
@@ -28,7 +28,6 @@ Game::Game() {
 	decksAm = 0;
 	gameEnd = true;
 	pulledCard = NULL;
-
 }
 
 
@@ -71,8 +70,7 @@ void Game::InitializeDecks() {
 }
 
 void Game::DrawCard() {
-	Card* lastCard = &cards.back();
-	pulledCard = lastCard;
+	pulledCard = &cards.back();
 	cards.pop_back();
 }
 

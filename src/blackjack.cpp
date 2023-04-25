@@ -13,14 +13,28 @@
 #include "Card.h"
 #include "Deck.h"
 #include "Game.h"
+#include "CardCount.h"
 
 #include <iostream>
 #include <ctime>
 #include <vector>
 #include <sstream>
 #include <string>
+#include <thread>
 
 using namespace std;
+
+class BlackJack {
+	Game* pGame;
+	public: 
+		BlackJack(Game* game) {
+			pGame = game;
+		}
+
+		Game* getGameP() {
+			return pGame;
+		}
+};
 
 Game InitializeGame(int am) {
 	Player p(1000);
@@ -54,10 +68,10 @@ void Begin(Game &game) {
 	if (!game.getGameEnd()) game.DealerTurn();
 };
 
-void NewGame(Game &game) {
-	game.setGameEnd(false);
-	game.ResetTable();
-	Begin(game);
+void NewGame(Game* game) {
+	game->setGameEnd(false);
+	game->ResetTable();
+	Begin(*game);
 };
 
 bool ValidateBet(string betAmStr, double* betAmD) {
@@ -80,6 +94,14 @@ bool ValidateBet(string betAmStr, double* betAmD) {
 	return true;
 }
 
+void startCC(CardCount cc) {
+	cc.run();
+}
+
+void startGame(BlackJack bj) {
+	NewGame(bj.getGameP());
+}
+
 int main(int argc, char *argv[]) {
 	
 	SetConsoleOutputCP(CP_UTF8);
@@ -98,18 +120,24 @@ int main(int argc, char *argv[]) {
 	
 	Game game = InitializeGame(decksAm);
 
-
 	cout << "Decks in the game: " << game.cards.size() / 52 << endl;
 	cout << "Cards in the game: " << game.cards.size() << endl;
 
 	cout << "Shuffling..." << endl;
 	game.Shuffle();
+	
+	BlackJack bj(&game);
+/**
+	CardCount cc(decksAm, &(bj.getGameP()->pulledCard));
 
+	thread ccThread(startCC, cc);
+	ccThread.detach();
+**/	
 	while(true) {
 		string betAmStr;
 		double betAmD;
-
-		cout << "Balance: " << game.player.getBalance() << endl;
+	
+		cout << "Balance: " << bj.getGameP()->player.getBalance() << endl;
 		cout << "Set bet: ";
 		cin >> betAmStr;
 		cout << endl;
@@ -119,13 +147,16 @@ int main(int argc, char *argv[]) {
 			continue;
 		}
 		
-		if (!game.player.setBet(betAmD)) {
+		if (!bj.getGameP()->player.setBet(betAmD)) {
 			cout << "Not enough money to bet " << betAmStr << endl;
 			continue;
 		}
 
-		NewGame(game);
-	
+		thread gameThr(startGame, bj);
+		//NewGame(game);
+
+		gameThr.join();
+
 		char ng;
 		cout << "New game? [y/n]: ";
 		cin >> ng;

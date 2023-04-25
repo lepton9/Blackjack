@@ -1,3 +1,3 @@
 #!/bin/sh
 clear
-g++ *.cpp -o blackjack && ./blackjack.exe
+g++ -I ./include ./src/*.cpp -o blackjack && ./blackjack.exe

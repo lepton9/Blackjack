@@ -2,15 +2,12 @@
 | TODO: |
 ‾‾‾‾‾‾‾‾‾
 
+- own console window for cardcount printstream
 - make cool animations for the drawed cards
 - make the game compatible with older version of C++
 - add other commands like split and double down
 - refactoring
 - documentation
-
-- multithreading
-	- one thread for the game
-	- other to calculate all the card counting
 
 clubs    -%
 diamonds <>

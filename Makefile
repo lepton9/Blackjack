@@ -1,38 +1,45 @@
 
-blackjack: blackjack.o AsciiCards.o P.o Player.o Dealer.o Card.o Deck.o Game.o
-	g++ blackjack.o AsciiCards.o P.o Player.o Dealer.o Card.o Deck.o Game.o -o blackjack
+SRC := ./src
+INC := -I ./include
+FLAGS := -c $(INC)
+CC := g++
 
-blackjack.o: blackjack.cpp
-	g++ -c blackjack.cpp
+blackjack: blackjack.o AsciiCards.o P.o Player.o Dealer.o Card.o Deck.o Game.o CardCount.o
+	$(CC) $^ -o $@
 
-AsciiCards.o: AsciiCards.cpp
-	g++ -c AsciiCards.cpp
+blackjack.o: $(SRC)/blackjack.cpp
+	$(CC) $(FLAGS) $<
 
-P.o: P.cpp
-	g++ -c P.cpp
+AsciiCards.o: $(SRC)/AsciiCards.cpp
+	$(CC) $(FLAGS) $<
 
-Player.o: Player.cpp
-	g++ -c Player.cpp
+P.o: $(SRC)/P.cpp
+	$(CC) $(FLAGS) $<
 
-Dealer.o: Dealer.cpp
-	g++ -c Dealer.cpp
+Player.o: $(SRC)/Player.cpp
+	$(CC) $(FLAGS) $<
 
-Card.o: Card.cpp
-	g++ -c Card.cpp
+Dealer.o: $(SRC)/Dealer.cpp
+	$(CC) $(FLAGS) $<
 
-Deck.o: Deck.cpp
-	g++ -c Deck.cpp
+Card.o: $(SRC)/Card.cpp
+	$(CC) $(FLAGS) $<
 
-Game.o: Game.cpp
-	g++ -c Game.cpp
+Deck.o: $(SRC)/Deck.cpp
+	$(CC) $(FLAGS) $<
 
+Game.o: $(SRC)/Game.cpp
+	$(CC) $(FLAGS) $<
+
+CardCount.o: $(SRC)/CardCount.cpp
+	$(CC) $(FLAGS) $<
 
 debug:
-	g++ *.cpp -pthread -g -o bjDebug
+	$(CC) $(INC) $(SRC)/*.cpp -pthread -g -o bjDebug
 	gdb -tui bjDebug
 
 run: 
 	./blackjack
 
 clean:
-	rm *.o blackjack bjDebug
+	rm *.o bjDebug
