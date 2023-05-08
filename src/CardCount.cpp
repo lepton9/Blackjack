@@ -1,11 +1,22 @@
+#ifdef _WIN32
+#include <Windows.h>
+#define CLEAR "cls"
+#else
+#include <unistd.h>
+#define CLEAR "clear"
+#endif
+
+#include "Game.h"
 #include "CardCount.h"
 #include <iostream>
-#include <Windows.h>
+
 
 using std::cout;
 using std::endl;
 
-	
+int cardsPulled = 0;
+
+
 CardCount::CardCount(int dAm, Card** pCard) {
 	deckAmStart = dAm;
 	decksRem = dAm;
@@ -29,11 +40,7 @@ void CardCount::update(int cValue) {
 }
 
 int CardCount::calcRunCount(int cardValue) {
-	int i;
-	if (cardValue == 1 || cardValue == 11) i = 1;
-	else i = cardValue;
-
-	runCount += cValues[i - 1];
+	runCount += cValues[cardValue - 1];
 	return runCount;
 }
 
@@ -48,12 +55,18 @@ double CardCount::calcDecksRem() {
 }
 
 void CardCount::PrintCountState() {
+	Game::ClsFromCurPosTo({0, 5}, writePos);
+	SetConsoleCursorPosition(Game::hConsole, writePos);
+
+	cout << "Cards pulled: " << cardsPulled << endl;
+	cout << "Cards remaining: " << 52*getDecksAm() - cardsPulled << endl;
+	cout << "Decks: " << getDecksAm() << endl;
 	cout << "Running count: " << getRunCount() << endl;
 	printf("True count: %0.2lf\n",getTrueCount());
-	cout << "Decks: " << getDecksAm() << "\n" << endl;
 }
 
 void CardCount::inputCard(int cardValue) {
+	cardsPulled += 1;
 	cAmount -= 1;
 	update(cardValue);
 }
@@ -64,14 +77,16 @@ int CardCount::evalCard() {
 }
 
 void CardCount::run() {
-	int value = 0;
+	int value;
 	while(true) {
 		if (lastCard != *pulledCard) {
-			Sleep(2000);
-			*lastCard = **pulledCard;
+			lastCard = *pulledCard;
 			value = evalCard();
 			inputCard(value);
 			PrintCountState();
+			//Sleep(2000);
+			
+			Game::run = true;
 		}
 	}
 }

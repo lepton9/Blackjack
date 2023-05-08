@@ -7,7 +7,9 @@
 #include "Card.h"
 #include "Deck.h"
 
+#include <sstream>
 #include <vector>
+#include <string>
 
 using std::vector;
 
@@ -20,7 +22,13 @@ class Game {
 		Player player;
 		vector<Card> cards;
 		Card* pulledCard;
-	
+		static COORD writePos;
+
+		static HANDLE hConsole;
+		static bool run; // Flag to know if to continue the game
+		static bool ccOn;
+		static COORD lastLinePrinted;
+
 		Game(int dAm, Player p, Dealer d);
 		Game();
 
@@ -44,6 +52,14 @@ class Game {
 		bool PlayerTurn();
 		void ServeFirstCards();
 		void PrintStateOfGame();
+		void PrintAsciiCards(vector<vector<string>>* asciiCards);
+
+		static bool EqualCOORD(COORD a, COORD b);
+		static void ClsFromCurPosTo(COORD from, COORD to);
+		static COORD GetConsoleCursorPosition();
+
+		void RunFalseWaitCC();
+
 		void ResetTable();
 };
 

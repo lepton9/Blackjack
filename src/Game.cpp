@@ -16,18 +16,33 @@ using std::endl;
 using std::cin;
 
 
+bool Game::run = true;
+bool Game::ccOn = false;
+
+COORD Game::writePos = {0, 10};
+COORD Game::lastLinePrinted = writePos;
+HANDLE Game::hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+
 Game::Game(int dAm, Player p, Dealer d) {
 	decksAm = dAm;
 	pulledCard = NULL;
 	gameEnd = false;
 	player = p;
 	dealer = d;
+
 }
 
 Game::Game() {
 	decksAm = 0;
 	gameEnd = true;
 	pulledCard = NULL;
+}
+
+void Game::RunFalseWaitCC() {
+	Game::run = false;
+	while(!Game::run && ccOn) {
+		// Waits for CardCount to change run to true
+	}
 }
 
 
@@ -72,6 +87,7 @@ void Game::InitializeDecks() {
 void Game::DrawCard() {
 	pulledCard = &cards.back();
 	cards.pop_back();
+	RunFalseWaitCC();
 }
 
 void Game::HitPlayer() {
@@ -103,13 +119,63 @@ void Game::ResetTable() {
 	dealer.Reset();
 }
 
+bool Game::EqualCOORD(COORD a, COORD b) {
+	if (a.X != b.X) return false;
+	if (a.Y != b.Y) return false;
+	return true;
+}
+
+COORD Game::GetConsoleCursorPosition()
+{
+	CONSOLE_SCREEN_BUFFER_INFO cbsi;
+	if (GetConsoleScreenBufferInfo(Game::hConsole, &cbsi))
+	{
+		return cbsi.dwCursorPosition;
+	}
+	else
+	{
+		throw (GetLastError());
+		// The function failed. Call GetLastError() for details.
+		COORD invalid = { 0, 0 };
+		return invalid;
+	}
+}
+
+
+void Game::ClsFromCurPosTo(COORD from, COORD to) {
+	SetConsoleCursorPosition(Game::hConsole, from);
+
+	std::cout << "\x1b[2K"; // Delete current line
+	while(!EqualCOORD(GetConsoleCursorPosition(), to)) {
+		std::cout << "\x1b[1A" // Move cursor up
+			  << "\x1b[2K"; // Delete line
+	}
+}
+
 
 void Game::PrintStateOfGame() {
-	system(CLEAR);
-	dealer.PrintAsciiCards();
+	//system(CLEAR);
+	ClsFromCurPosTo(Game::lastLinePrinted, Game::writePos);
+
+	SetConsoleCursorPosition(hConsole, writePos);
+	
+	PrintAsciiCards(dealer.GetAsciiCards());
         cout << "Dealer: " << dealer.getCardsTotal() << endl;
-	player.PrintAsciiCards();
+	PrintAsciiCards(player.GetAsciiCards());
         cout << "Player: " << player.getCardsTotal() << "\n" << endl;
+
+	Game::lastLinePrinted = GetConsoleCursorPosition();
+}
+
+void Game::PrintAsciiCards(vector<vector<string>>* asciiCards) {
+	int cardHeight = 6;
+
+	for (int i = 0; i < cardHeight; i++) {
+		for (vector<string> asciiCard : *asciiCards) {
+			cout << asciiCard[i];
+		}
+		cout << endl;
+	}
 }
 
 bool Game::HandleGameEnd(int result) {

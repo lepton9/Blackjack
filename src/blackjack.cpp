@@ -6,12 +6,6 @@
 #define CLEAR "clear"
 #endif
 
-#include "AsciiCards.h"
-#include "P.h"
-#include "Player.h"
-#include "Dealer.h"
-#include "Card.h"
-#include "Deck.h"
 #include "Game.h"
 #include "CardCount.h"
 
@@ -26,14 +20,22 @@ using namespace std;
 
 class BlackJack {
 	Game* pGame;
+	bool ccReady;
+
 	public: 
 		BlackJack(Game* game) {
 			pGame = game;
+			ccReady = true;
 		}
 
 		Game* getGameP() {
 			return pGame;
 		}
+
+		void setReady(bool rdy) {
+			ccReady = rdy;
+		}
+		bool getReady() {return ccReady;}
 };
 
 Game InitializeGame(int am) {
@@ -127,12 +129,16 @@ int main(int argc, char *argv[]) {
 	game.Shuffle();
 	
 	BlackJack bj(&game);
-/**
-	CardCount cc(decksAm, &(bj.getGameP()->pulledCard));
 
-	thread ccThread(startCC, cc);
-	ccThread.detach();
-**/	
+	thread* ccThread;
+	if (argc >= 3) {
+		Game::ccOn = true;
+
+		CardCount cc(decksAm, &(bj.getGameP()->pulledCard));
+		ccThread = new thread(startCC, cc);
+		ccThread->detach();
+	} else {Game::writePos = {0,0};}
+
 	while(true) {
 		string betAmStr;
 		double betAmD;
@@ -152,6 +158,11 @@ int main(int argc, char *argv[]) {
 			continue;
 		}
 
+		system(CLEAR);
+		for (int i = 0; i < bj.getGameP()->writePos.Y; i++) {
+			cout << "\n";
+		}
+
 		thread gameThr(startGame, bj);
 		//NewGame(game);
 
@@ -168,6 +179,7 @@ int main(int argc, char *argv[]) {
 			case('n'):
 				break;
 		}
+
 		cout << "Exiting..." << endl;
 		break;
 	}

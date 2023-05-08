@@ -44,6 +44,17 @@ void P::PrintAsciiCards() {
 	}
 }
 
+vector<vector<string>>* P::GetAsciiCards() {	
+	asciiCards.clear();
+	for (Card card : cards) {
+		asciiCards.push_back(GetAsciiCard(card.suit, card.rank));
+	}
+	if (asciiCards.size() < 2) {
+		asciiCards.push_back(GetAsciiCard()); // Blank card
+	}
+	return &asciiCards;
+}
+
 
 void P::EvalCard(Card* card) {
 	if ((*card).rank == 1) { // Ace

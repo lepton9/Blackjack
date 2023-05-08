@@ -3,12 +3,14 @@
 
 #include "Card.h"
 #include <vector>
+#include <string>
 
 using std::vector;
 
 class P {
 		vector<Card> cards;
 		int cardsTotal;
+		vector<vector<string>> asciiCards;
 	public:
 
 		vector<Card> getCards();
@@ -18,6 +20,7 @@ class P {
 
 		void Reset();
 		void PrintAsciiCards();
+		vector<vector<string>>* GetAsciiCards();
 		void EvalCard(Card* card);
 };
 
