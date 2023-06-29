@@ -27,6 +27,7 @@ class Game {
 		static HANDLE hConsole;
 		static bool run; // Flag to know if to continue the game
 		static bool ccOn;
+		static bool res;
 		static COORD lastLinePrinted;
 
 		Game(int dAm, Player p, Dealer d);
@@ -59,6 +60,7 @@ class Game {
 		static COORD GetConsoleCursorPosition();
 
 		void RunFalseWaitCC();
+		void ResetWaitCC();
 
 		void ResetTable();
 };

@@ -2,12 +2,9 @@
 | TODO: |
 ‾‾‾‾‾‾‾‾‾
 
-- make so that CardCount doesn't count the faceDownCard until it's been revealed
-- reset CardCount when reshuffling new set of decks
-- make cool animations for the drawed cards
-- make the game compatible with older version of C++
+- CardCount not counting the faceDownCard until it's been revealed
+- cool animations for the drawed cards
 - add other commands like split and double down
-- refactoring
 - documentation
 
 clubs    -%

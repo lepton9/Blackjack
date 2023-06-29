@@ -27,6 +27,7 @@ CardCount::CardCount(int dAm, Card** pCard) {
 
 	pulledCard = pCard;
 	lastCard = NULL;
+	stop = false;
 }
 
 int CardCount::getRunCount() {return runCount;}
@@ -39,14 +40,12 @@ void CardCount::update(int cValue) {
 	calcTrueCount();
 }
 
-int CardCount::calcRunCount(int cardValue) {
+void CardCount::calcRunCount(int cardValue) {
 	runCount += cValues[cardValue - 1];
-	return runCount;
 }
 
-double CardCount::calcTrueCount() {
+void CardCount::calcTrueCount() {
 	trueCount = runCount / calcDecksRem();
-	return trueCount;
 }
 
 double CardCount::calcDecksRem() {
@@ -62,7 +61,7 @@ void CardCount::PrintCountState() {
 	cout << "Cards remaining: " << 52*getDecksAm() - cardsPulled << endl;
 	cout << "Decks: " << getDecksAm() << endl;
 	cout << "Running count: " << getRunCount() << endl;
-	printf("True count: %0.2lf\n",getTrueCount());
+	printf("True count: %0.2lf\n", getTrueCount());
 }
 
 void CardCount::inputCard(int cardValue) {
@@ -79,16 +78,29 @@ int CardCount::evalCard() {
 void CardCount::run() {
 	int value;
 	while(true) {
+		if (Game::res) {Reset();}
+
 		if (lastCard != *pulledCard) {
 			lastCard = *pulledCard;
 			value = evalCard();
 			inputCard(value);
 			PrintCountState();
-			//Sleep(2000);
 			
 			Game::run = true;
 		}
 	}
+}
+
+void CardCount::stopTrue() {stop = true;}
+
+void CardCount::Reset() {
+	decksRem = deckAmStart;
+	cAmount = deckAmStart * 52;
+	cardsPulled = 0;
+	runCount = 0;
+	trueCount = 0;
+	PrintCountState();
+	Game::res = false;
 }
 
 /**

@@ -15,6 +15,8 @@ class CardCount {
 	
 	int runCount;
 	double trueCount;
+	
+	bool stop;
 
 	Card** pulledCard;
 	Card* lastCard;
@@ -29,13 +31,15 @@ class CardCount {
 		double getTrueCount();
 		int getDecksAm();
 		void update(int cValue);
-		int calcRunCount(int cardValue);
-		double calcTrueCount();
+		void calcRunCount(int cardValue);
+		void calcTrueCount();
 		double calcDecksRem();
 		void PrintCountState();
 		void inputCard(int cardValue);
 		int evalCard();
 		void run();
+		void Reset();
+		void stopTrue();
 };
 
 #endif

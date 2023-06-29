@@ -18,25 +18,6 @@
 
 using namespace std;
 
-class BlackJack {
-	Game* pGame;
-	bool ccReady;
-
-	public: 
-		BlackJack(Game* game) {
-			pGame = game;
-			ccReady = true;
-		}
-
-		Game* getGameP() {
-			return pGame;
-		}
-
-		void setReady(bool rdy) {
-			ccReady = rdy;
-		}
-		bool getReady() {return ccReady;}
-};
 
 Game InitializeGame(int am) {
 	Player p(1000);
@@ -49,31 +30,33 @@ Game InitializeGame(int am) {
 };
 
 
-void PrintAllCards(Game game) {
-	for (int i = 0; i < game.cards.size(); i++) {
-		cout << game.cards[i].rank << ", ";
+void PrintAllCards(Game* game) {
+	for (int i = 0; i < game->cards.size(); i++) {
+		cout << game->cards[i].rank << ", ";
 	}
 	cout << endl;
 };
 
-void Begin(Game &game) {
-	if (game.cards.size() < 20) {
+void Begin(Game* game) {
+	if (game->cards.size() < 20) {
 		cout << "Shuffling new set of decks..." << endl;
-		game.InitializeDecks();
-		game.Shuffle();
+		game->InitializeDecks();
+		game->Shuffle();
+		game->ResetWaitCC();
+
 		Sleep(1000);
 	}
 
-	game.ServeFirstCards();
-	game.PrintStateOfGame();
-	while(game.PlayerTurn());
-	if (!game.getGameEnd()) game.DealerTurn();
+	game->ServeFirstCards();
+	game->PrintStateOfGame();
+	while(game->PlayerTurn());
+	if (!game->getGameEnd()) game->DealerTurn();
 };
 
 void NewGame(Game* game) {
 	game->setGameEnd(false);
 	game->ResetTable();
-	Begin(*game);
+	Begin(game);
 };
 
 bool ValidateBet(string betAmStr, double* betAmD) {
@@ -100,8 +83,8 @@ void startCC(CardCount cc) {
 	cc.run();
 }
 
-void startGame(BlackJack bj) {
-	NewGame(bj.getGameP());
+void startGame(Game* game) {
+	NewGame(game);
 }
 
 int main(int argc, char *argv[]) {
@@ -128,13 +111,13 @@ int main(int argc, char *argv[]) {
 	cout << "Shuffling..." << endl;
 	game.Shuffle();
 	
-	BlackJack bj(&game);
 
 	thread* ccThread;
 	if (argc >= 3) {
 		Game::ccOn = true;
 
-		CardCount cc(decksAm, &(bj.getGameP()->pulledCard));
+		CardCount cc(decksAm, &(game.pulledCard));
+
 		ccThread = new thread(startCC, cc);
 		ccThread->detach();
 	} else {Game::writePos = {0,0};}
@@ -143,7 +126,7 @@ int main(int argc, char *argv[]) {
 		string betAmStr;
 		double betAmD;
 	
-		cout << "Balance: " << bj.getGameP()->player.getBalance() << endl;
+		cout << "Balance: " << game.player.getBalance() << endl;
 		cout << "Set bet: ";
 		cin >> betAmStr;
 		cout << endl;
@@ -153,18 +136,17 @@ int main(int argc, char *argv[]) {
 			continue;
 		}
 		
-		if (!bj.getGameP()->player.setBet(betAmD)) {
+		if (!game.player.setBet(betAmD)) {
 			cout << "Not enough money to bet " << betAmStr << endl;
 			continue;
 		}
 
 		system(CLEAR);
-		for (int i = 0; i < bj.getGameP()->writePos.Y; i++) {
+		for (int i = 0; i < game.writePos.Y; i++) {
 			cout << "\n";
 		}
 
-		thread gameThr(startGame, bj);
-		//NewGame(game);
+		thread gameThr(startGame, &game);
 
 		gameThr.join();
 
@@ -183,6 +165,8 @@ int main(int argc, char *argv[]) {
 		cout << "Exiting..." << endl;
 		break;
 	}
+
+	system(CLEAR);
 
 	return 0;
 

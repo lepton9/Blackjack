@@ -18,6 +18,7 @@ using std::cin;
 
 bool Game::run = true;
 bool Game::ccOn = false;
+bool Game::res = false;
 
 COORD Game::writePos = {0, 10};
 COORD Game::lastLinePrinted = writePos;
@@ -45,6 +46,12 @@ void Game::RunFalseWaitCC() {
 	}
 }
 
+void Game::ResetWaitCC() {
+	Game::res = true;
+	while(Game::res && ccOn) {
+		// Waits for CardCount to change res to false
+	}
+}
 
 bool Game::getGameEnd() {return gameEnd;}
 void Game::setGameEnd(bool end) {
@@ -135,7 +142,7 @@ COORD Game::GetConsoleCursorPosition()
 	else
 	{
 		throw (GetLastError());
-		// The function failed. Call GetLastError() for details.
+		// The function failed. Call GetLastError() for details
 		COORD invalid = { 0, 0 };
 		return invalid;
 	}
